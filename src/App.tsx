@@ -1,6 +1,7 @@
 import React from 'react';
 import '@tensorflow/tfjs-backend-webgl';
 import * as handPoseDetection from '@tensorflow-models/hand-pose-detection';
+import { createKeyMap, getHandPoseEstimationsDistances, KMeansCentroidsSearch } from './utils.ts';
 import './App.css';
 
 // Create a hand model detection detector instance
@@ -14,7 +15,11 @@ export const App: React.FC = () => {
         const hands = await detector.estimateHands(videoRef.current!);
 
         if (hands.length > 0) {
-            console.log(hands);
+            const data = createKeyMap(hands[0].keypoints);
+            const distances = getHandPoseEstimationsDistances(data);
+            const category = KMeansCentroidsSearch(distances);
+
+            console.log('Hand pose:', category === 0 ? 'fist' : 'palm');
         }
 
         return handleDetection();
